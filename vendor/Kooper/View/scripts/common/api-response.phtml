@@ -1,0 +1,30 @@
+<?php
+/**
+ * Kooper library (https://bitbucket.org/ottilus/library-kooper)
+ *
+ * @link       https://bitbucket.org/ottilus/library-kooper for the source repository
+ * @copyright  Copyright (c) 2013 OTTilus Ltd. (http://www.ottilus.com)
+ * @category   Kooper
+ * @package    Kooper_View
+ * @subpackage Scripts
+ */
+namespace Kooper\View\Script;
+
+/**
+ * Standard API response view template.
+ * 
+ * Loads all the registered view variables via the vars() method and parses the
+ * results into an HTML table using the htmltable view helper
+ * 
+ * @category   Kooper
+ * @package    Kooper_View
+ * @subpackage Scripts
+ */
+?>
+<div class="row">
+    <?php if (count($this->vars())) : ?>
+    <?php echo $this->htmltable($this->vars()); ?>
+    <?php else : ?>
+    <p class="text-warning">No results found</p>
+    <?php endif; ?>
+</div>
