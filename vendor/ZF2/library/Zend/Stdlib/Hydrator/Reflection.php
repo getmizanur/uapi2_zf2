@@ -36,7 +36,7 @@ class Reflection extends AbstractHydrator
             }
 
             $value = $property->getValue($object);
-            $result[$propertyName] = $this->extractValue($propertyName, $value);
+            $result[$propertyName] = $this->extractValue($propertyName, $value, $object);
         }
 
         return $result;
@@ -54,7 +54,7 @@ class Reflection extends AbstractHydrator
         $reflProperties = self::getReflProperties($object);
         foreach ($data as $key => $value) {
             if (isset($reflProperties[$key])) {
-                $reflProperties[$key]->setValue($object, $this->hydrateValue($key, $value));
+                $reflProperties[$key]->setValue($object, $this->hydrateValue($key, $value, $data));
             }
         }
         return $object;
@@ -64,8 +64,7 @@ class Reflection extends AbstractHydrator
      * Get a reflection properties from in-memory cache and lazy-load if
      * class has not been loaded.
      *
-     * @static
-     * @param string|object $input
+     * @param  string|object $input
      * @throws Exception\InvalidArgumentException
      * @return array
      */
@@ -77,14 +76,17 @@ class Reflection extends AbstractHydrator
             throw new Exception\InvalidArgumentException('Input must be a string or an object.');
         }
 
-        if (!isset(static::$reflProperties[$input])) {
-            $reflClass      = new ReflectionClass($input);
-            $reflProperties = $reflClass->getProperties();
+        if (isset(static::$reflProperties[$input])) {
+            return static::$reflProperties[$input];
+        }
 
-            foreach ($reflProperties as $property) {
-                $property->setAccessible(true);
-                static::$reflProperties[$input][$property->getName()] = $property;
-            }
+        static::$reflProperties[$input] = array();
+        $reflClass                      = new ReflectionClass($input);
+        $reflProperties                 = $reflClass->getProperties();
+
+        foreach ($reflProperties as $property) {
+            $property->setAccessible(true);
+            static::$reflProperties[$input][$property->getName()] = $property;
         }
 
         return static::$reflProperties[$input];

@@ -172,9 +172,7 @@ class SessionRestController extends AbstractRestfulController
                 $inputFilter->getValue('companyid')
             );
 
-            var_dump($result);
-            die();
-            if($result) {
+            if(count($result) > 1) {
                 $deviceResultSet = $sm->get('DeviceModel')->getDeviceByCustomerId(
                     $result->customer_id
                 );
@@ -182,7 +180,7 @@ class SessionRestController extends AbstractRestfulController
                 if(!$deviceResultSet){
                     $device = new Device();
                     $device->device_name = "test";
-                    $device->device_cust_id = $result->customer_id;
+                    $device->device_cust_id = $result['customer_id'];
                     $device->device_vutv_device_id = uniqid();
                     $device->device_active = 1;
                     $device->device_activation = date('Y-m-s H:i:s');

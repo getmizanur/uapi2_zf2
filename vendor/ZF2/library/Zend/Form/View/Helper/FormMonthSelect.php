@@ -30,7 +30,7 @@ class FormMonthSelect extends AbstractHelper
      *
      * @var int
      */
-    protected $dateType = IntlDateFormatter::LONG;
+    protected $dateType;
 
     /**
      * Pattern to use for Date rendering
@@ -46,11 +46,51 @@ class FormMonthSelect extends AbstractHelper
      */
     protected $locale;
 
+    /**
+     * @throws Exception\ExtensionNotLoadedException if ext/intl is not present
+     */
+    public function __construct()
+    {
+        if (!extension_loaded('intl')) {
+            throw new Exception\ExtensionNotLoadedException(sprintf(
+                '%s component requires the intl PHP extension',
+                __NAMESPACE__
+            ));
+        }
+
+        // Delaying initialization until we know ext/intl is available
+        $this->dateType = IntlDateFormatter::LONG;
+    }
+
+    /**
+     * Invoke helper as function
+     *
+     * Proxies to {@link render()}.
+     *
+     * @param  ElementInterface $element
+     * @param  int              $dateType
+     * @param  null|string      $locale
+     * @return FormDateSelect
+     */
+    public function __invoke(ElementInterface $element = null, $dateType = IntlDateFormatter::LONG, $locale = null)
+    {
+        if (!$element) {
+            return $this;
+        }
+
+        $this->setDateType($dateType);
+
+        if ($locale !== null) {
+            $this->setLocale($locale);
+        }
+
+        return $this->render($element);
+    }
 
     /**
      * Render a month element that is composed of two selects
      *
-     * @param \Zend\Form\ElementInterface $element
+     * @param  \Zend\Form\ElementInterface $element
      * @throws \Zend\Form\Exception\InvalidArgumentException
      * @throws \Zend\Form\Exception\DomainException
      * @return string
@@ -73,7 +113,7 @@ class FormMonthSelect extends AbstractHelper
         }
 
         $selectHelper = $this->getSelectElementHelper();
-        $pattern      = $this->parsePattern();
+        $pattern      = $this->parsePattern($element->shouldRenderDelimiters());
 
         // The pattern always contains "day" part and the first separator, so we have to remove it
         unset($pattern['day']);
@@ -90,51 +130,58 @@ class FormMonthSelect extends AbstractHelper
             $yearElement->setEmptyOption('');
         }
 
-        $markup = array();
-        $markup[$pattern['month']] = $selectHelper->render($monthElement);
-        $markup[$pattern['year']]  = $selectHelper->render($yearElement);
+        $data = array();
+        $data[$pattern['month']] = $selectHelper->render($monthElement);
+        $data[$pattern['year']]  = $selectHelper->render($yearElement);
 
-        $markup = sprintf(
-            '%s %s %s',
-            $markup[array_shift($pattern)],
-            array_shift($pattern), // Delimiter
-            $markup[array_shift($pattern)]
-        );
+        $markup = '';
+        foreach ($pattern as $key => $value) {
+            // Delimiter
+            if (is_numeric($key)) {
+                $markup .= $value;
+            } else {
+                $markup .= $data[$value];
+            }
+        }
 
         return $markup;
     }
 
     /**
-     * Invoke helper as function
+     * Parse the pattern
      *
-     * Proxies to {@link render()}.
-     *
-     * @param \Zend\Form\ElementInterface $element
-     * @param int                         $dateType
-     * @param null|string                 $locale
-     * @return FormDateSelect
+     * @param  bool $renderDelimiters
+     * @return array
      */
-    public function __invoke(ElementInterface $element = null, $dateType = IntlDateFormatter::LONG, $locale = null)
+    protected function parsePattern($renderDelimiters = true)
     {
-        if (!$element) {
-            return $this;
+        $pattern    = $this->getPattern();
+        $pregResult = preg_split("/([ -,.\/]*(?:'[a-zA-Z]+')*[ -,.\/]+)/", $pattern, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        $result = array();
+        foreach ($pregResult as $value) {
+            if (stripos($value, "'") === false && stripos($value, 'd') !== false) {
+                $result['day'] = $value;
+            } elseif (stripos($value, "'") === false && stripos($value, 'm') !== false) {
+                $result['month'] = $value;
+            } elseif (stripos($value, "'") === false && stripos($value, 'y') !== false) {
+                $result['year'] = $value;
+            } elseif ($renderDelimiters) {
+                $result[] = str_replace("'", '', $value);
+            }
         }
 
-        $this->setDateType($dateType);
-
-        if ($locale !== null) {
-            $this->setLocale($locale);
-        }
-
-        return $this->render($element);
+        return $result;
     }
 
     /**
+     * Retrieve pattern to use for Date rendering
+     *
      * @return string
      */
     public function getPattern()
     {
-        if ($this->pattern === null) {
+        if (null === $this->pattern) {
             $intl           = new IntlDateFormatter($this->getLocale(), $this->dateType, IntlDateFormatter::NONE);
             $this->pattern  = $intl->getPattern();
         }
@@ -143,32 +190,8 @@ class FormMonthSelect extends AbstractHelper
     }
 
     /**
-     * Parse the pattern
+     * Set date formatter
      *
-     * @return array
-     */
-    protected function parsePattern()
-    {
-        $pattern    = $this->getPattern();
-        $pregResult = preg_split('/([ -,.\/]+)/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
-        $result = array();
-        foreach ($pregResult as $value) {
-            if (stripos($value, 'd') !== false) {
-                $result['day'] = $value;
-            } elseif (stripos($value, 'm') !== false) {
-                $result['month'] = $value;
-            } elseif (stripos($value, 'y') !== false) {
-                $result['year'] = $value;
-            } else {
-                $result[] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @param  int $dateType
      * @return FormDateSelect
      */
@@ -185,6 +208,8 @@ class FormMonthSelect extends AbstractHelper
     }
 
     /**
+     * Get date formatter
+     *
      * @return int
      */
     public function getDateType()
@@ -193,6 +218,8 @@ class FormMonthSelect extends AbstractHelper
     }
 
     /**
+     * Set locale
+     *
      * @param  string $locale
      * @return FormDateSelect
      */
@@ -203,11 +230,13 @@ class FormMonthSelect extends AbstractHelper
     }
 
     /**
+     * Get locale
+     *
      * @return string
      */
     public function getLocale()
     {
-        if ($this->locale === null) {
+        if (null === $this->locale) {
             $this->locale = Locale::getDefault();
         }
 
@@ -228,8 +257,8 @@ class FormMonthSelect extends AbstractHelper
 
         $result = array();
         for ($month = 1; $month <= 12; $month++) {
-            $key   = $keyFormatter->format($date);
-            $value = $valueFormatter->format($date);
+            $key   = $keyFormatter->format($date->getTimestamp());
+            $value = $valueFormatter->format($date->getTimestamp());
             $result[$key] = $value;
 
             $date->modify('+1 month');
@@ -260,7 +289,7 @@ class FormMonthSelect extends AbstractHelper
     /**
      * Retrieve the FormSelect helper
      *
-     * @return FormRow
+     * @return FormSelect
      */
     protected function getSelectElementHelper()
     {

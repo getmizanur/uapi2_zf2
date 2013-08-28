@@ -146,7 +146,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
     public function connect()
     {
         if (is_resource($this->resource)) {
-            return;
+            return $this;
         }
 
         // localize
@@ -242,7 +242,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
      * Execute
      *
      * @param  string $sql
-     * @return ResultInterface
+     * @return Result
      */
     public function execute($sql)
     {
@@ -275,7 +275,7 @@ class Connection implements ConnectionInterface, Profiler\ProfilerAwareInterface
      * Get last generated id
      *
      * @param  null $name Ignored
-     * @return integer
+     * @return int
      */
     public function getLastGeneratedValue($name = null)
     {

@@ -103,6 +103,7 @@ class Oci8 implements DriverInterface, Profiler\ProfilerAwareInterface
      * Register statement prototype
      *
      * @param Statement $statementPrototype
+     * @return Oci8
      */
     public function registerStatementPrototype(Statement $statementPrototype)
     {
@@ -123,6 +124,7 @@ class Oci8 implements DriverInterface, Profiler\ProfilerAwareInterface
      * Register result prototype
      *
      * @param Result $resultPrototype
+     * @return Oci8
      */
     public function registerResultPrototype(Result $resultPrototype)
     {
@@ -146,11 +148,7 @@ class Oci8 implements DriverInterface, Profiler\ProfilerAwareInterface
      */
     public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE)
     {
-        if ($nameFormat == self::NAME_FORMAT_CAMELCASE) {
-            return 'Oracle';
-        } else {
-            return 'Oracle';
-        }
+        return 'Oracle';
     }
 
     /**
@@ -197,7 +195,8 @@ class Oci8 implements DriverInterface, Profiler\ProfilerAwareInterface
     }
 
     /**
-     * @param resource $resource
+     * @param  resource $resource
+     * @param  null     $isBuffered
      * @return Result
      */
     public function createResult($resource, $isBuffered = null)

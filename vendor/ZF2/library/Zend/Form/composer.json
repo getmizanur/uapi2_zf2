@@ -22,5 +22,11 @@
     },
     "suggest": {
         "zendframework/zendservice-recaptcha": "ZendService\\ReCaptcha component"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.2-dev",
+            "dev-develop": "2.3-dev"
+        }
     }
 }

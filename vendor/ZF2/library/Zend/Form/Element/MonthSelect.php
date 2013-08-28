@@ -9,13 +9,13 @@
 
 namespace Zend\Form\Element;
 
-use DateTime;
+use DateTime as PhpDateTime;
 use Zend\Form\Element;
 use Zend\Form\ElementPrepareAwareInterface;
 use Zend\Form\FormInterface;
 use Zend\InputFilter\InputProviderInterface;
-use Zend\Validator\ValidatorInterface;
 use Zend\Validator\Regex as RegexValidator;
+use Zend\Validator\ValidatorInterface;
 
 class MonthSelect extends Element implements InputProviderInterface, ElementPrepareAwareInterface
 {
@@ -54,6 +54,14 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
      * @var bool
      */
     protected $createEmptyOption = false;
+
+    /**
+     * If set to true, view helpers will render delimiters between <select> elements, according to the
+     * specified locale
+     *
+     * @var bool
+     */
+    protected $renderDelimiters = true;
 
     /**
      * @var ValidatorInterface
@@ -110,6 +118,10 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
         if (isset($options['create_empty_option'])) {
             $this->setShouldCreateEmptyOption($options['create_empty_option']);
+        }
+
+        if (isset($options['render_delimiters'])) {
+            $this->setShouldRenderDelimiters($options['render_delimiters']);
         }
 
         return $this;
@@ -230,12 +242,30 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
     }
 
     /**
+     * @param  bool $renderDelimiters
+     * @return MonthSelect
+     */
+    public function setShouldRenderDelimiters($renderDelimiters)
+    {
+        $this->renderDelimiters = (bool) $renderDelimiters;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldRenderDelimiters()
+    {
+        return $this->renderDelimiters;
+    }
+
+    /**
      * @param mixed $value
      * @return void|\Zend\Form\Element
      */
     public function setValue($value)
     {
-        if ($value instanceof DateTime) {
+        if ($value instanceof PhpDateTime) {
             $value = array(
                 'year'  => $value->format('Y'),
                 'month' => $value->format('m')

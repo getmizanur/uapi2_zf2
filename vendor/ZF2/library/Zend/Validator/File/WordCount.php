@@ -28,8 +28,8 @@ class WordCount extends AbstractValidator
      * @var array Error message templates
      */
     protected $messageTemplates = array(
-        self::TOO_MUCH => "Too much words, maximum '%max%' are allowed but '%count%' were counted",
-        self::TOO_LESS => "Too less words, minimum '%min%' are expected but '%count%' were counted",
+        self::TOO_MUCH => "Too many words, maximum '%max%' are allowed but '%count%' were counted",
+        self::TOO_LESS => "Too few words, minimum '%min%' are expected but '%count%' were counted",
         self::NOT_FOUND => "File is not readable or does not exist",
     );
 
@@ -45,7 +45,7 @@ class WordCount extends AbstractValidator
     /**
      * Word count
      *
-     * @var integer
+     * @var int
      */
     protected $count;
 
@@ -70,7 +70,7 @@ class WordCount extends AbstractValidator
      * 'min': Minimum word count
      * 'max': Maximum word count
      *
-     * @param  integer|array|\Traversable $options Options for the adapter
+     * @param  int|array|\Traversable $options Options for the adapter
      */
     public function __construct($options = null)
     {
@@ -89,7 +89,7 @@ class WordCount extends AbstractValidator
     /**
      * Returns the minimum word count
      *
-     * @return integer
+     * @return int
      */
     public function getMin()
     {
@@ -99,7 +99,7 @@ class WordCount extends AbstractValidator
     /**
      * Sets the minimum word count
      *
-     * @param  integer|array $min The minimum word count
+     * @param  int|array $min The minimum word count
      * @return WordCount Provides a fluent interface
      * @throws Exception\InvalidArgumentException When min is greater than max
      */
@@ -113,7 +113,7 @@ class WordCount extends AbstractValidator
             throw new Exception\InvalidArgumentException('Invalid options to validator provided');
         }
 
-        $min = (integer) $min;
+        $min = (int) $min;
         if (($this->getMax() !== null) && ($min > $this->getMax())) {
             throw new Exception\InvalidArgumentException(
                 "The minimum must be less than or equal to the maximum word count, but $min >"
@@ -127,7 +127,7 @@ class WordCount extends AbstractValidator
     /**
      * Returns the maximum word count
      *
-     * @return integer
+     * @return int
      */
     public function getMax()
     {
@@ -137,7 +137,7 @@ class WordCount extends AbstractValidator
     /**
      * Sets the maximum file count
      *
-     * @param  integer|array $max The maximum word count
+     * @param  int|array $max The maximum word count
      * @return WordCount Provides a fluent interface
      * @throws Exception\InvalidArgumentException When max is smaller than min
      */
@@ -151,7 +151,7 @@ class WordCount extends AbstractValidator
             throw new Exception\InvalidArgumentException('Invalid options to validator provided');
         }
 
-        $max = (integer) $max;
+        $max = (int) $max;
         if (($this->getMin() !== null) && ($max < $this->getMin())) {
             throw new Exception\InvalidArgumentException(
                 "The maximum must be greater than or equal to the minimum word count, but "
@@ -166,12 +166,17 @@ class WordCount extends AbstractValidator
      * Returns true if and only if the counted words are at least min and
      * not bigger than max (when max is not null).
      *
-     * @param  string $value|array Filename to check for word count
+     * @param  string|array $value Filename to check for word count
+     * @param  array        $file  File data from \Zend\File\Transfer\Transfer (optional)
      * @return bool
      */
-    public function isValid($value)
+    public function isValid($value, $file = null)
     {
-        if (is_array($value)) {
+        if (is_string($value) && is_array($file)) {
+            // Legacy Zend\Transfer API support
+            $filename = $file['name'];
+            $file     = $file['tmp_name'];
+        } elseif (is_array($value)) {
             if (!isset($value['tmp_name']) || !isset($value['name'])) {
                 throw new Exception\InvalidArgumentException(
                     'Value array must be in $_FILES format'

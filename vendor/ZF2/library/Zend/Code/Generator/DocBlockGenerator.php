@@ -35,6 +35,11 @@ class DocBlockGenerator extends AbstractGenerator
     protected $indentation = '';
 
     /**
+     * @var bool
+     */
+    protected $wordwrap = true;
+
+    /**
      * Build a DocBlock generator object from a reflection object
      *
      * @param  DocBlockReflection $reflectionDocBlock
@@ -114,7 +119,6 @@ class DocBlockGenerator extends AbstractGenerator
     public function setShortDescription($shortDescription)
     {
         $this->shortDescription = $shortDescription;
-
         return $this;
     }
 
@@ -133,7 +137,6 @@ class DocBlockGenerator extends AbstractGenerator
     public function setLongDescription($longDescription)
     {
         $this->longDescription = $longDescription;
-
         return $this;
     }
 
@@ -168,15 +171,14 @@ class DocBlockGenerator extends AbstractGenerator
         if (is_array($tag)) {
             $tag = new DockBlockTag($tag);
         } elseif (!$tag instanceof DockBlockTag) {
-            throw new Exception\InvalidArgumentException(
+            throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects either an array of method options or an instance of %s\DocBlock\Tag',
                 __METHOD__,
                 __NAMESPACE__
-            );
+            ));
         }
 
         $this->tags[] = $tag;
-
         return $this;
     }
 
@@ -189,12 +191,34 @@ class DocBlockGenerator extends AbstractGenerator
     }
 
     /**
+     * Set the word wrap
+     *
+     * @param bool $value
+     * @return \Zend\Code\Generator\DocBlockGenerator
+     */
+    public function setWordWrap($value)
+    {
+        $this->wordwrap = (bool) $value;
+        return $this;
+    }
+
+    /**
+     * Get the word wrap
+     *
+     * @return bool
+     */
+    public function getWordWrap()
+    {
+        return $this->wordwrap;
+    }
+
+    /**
      * @return string
      */
     public function generate()
     {
         if (!$this->isSourceDirty()) {
-            return $this->docCommentize($this->getSourceContent());
+            return $this->docCommentize(trim($this->getSourceContent()));
         }
 
         $output = '';
@@ -220,7 +244,7 @@ class DocBlockGenerator extends AbstractGenerator
     {
         $indent  = $this->getIndentation();
         $output  = $indent . '/**' . self::LINE_FEED;
-        $content = wordwrap($content, 80, self::LINE_FEED);
+        $content = $this->getWordWrap() == true ? wordwrap($content, 80, self::LINE_FEED) : $content;
         $lines   = explode(self::LINE_FEED, $content);
         foreach ($lines as $line) {
             $output .= $indent . ' *';

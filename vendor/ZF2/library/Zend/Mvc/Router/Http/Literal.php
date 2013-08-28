@@ -16,8 +16,6 @@ use Zend\Stdlib\RequestInterface as Request;
 
 /**
  * Literal route.
- *
- * @see        http://guides.rubyonrails.org/routing.html
  */
 class Literal implements RouteInterface
 {
@@ -50,10 +48,10 @@ class Literal implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    Route::factory()
+     * @see    \Zend\Mvc\Router\RouteInterface::factory()
      * @param  array|Traversable $options
-     * @throws Exception\InvalidArgumentException
      * @return Literal
+     * @throws Exception\InvalidArgumentException
      */
     public static function factory($options = array())
     {
@@ -77,9 +75,9 @@ class Literal implements RouteInterface
     /**
      * match(): defined by RouteInterface interface.
      *
-     * @see    Route::match()
-     * @param  Request  $request
-     * @param  int|null $pathOffset
+     * @see    \Zend\Mvc\Router\RouteInterface::match()
+     * @param  Request      $request
+     * @param  integer|null $pathOffset
      * @return RouteMatch|null
      */
     public function match(Request $request, $pathOffset = null)
@@ -111,7 +109,7 @@ class Literal implements RouteInterface
     /**
      * assemble(): Defined by RouteInterface interface.
      *
-     * @see    Route::assemble()
+     * @see    \Zend\Mvc\Router\RouteInterface::assemble()
      * @param  array $params
      * @param  array $options
      * @return mixed
@@ -124,7 +122,7 @@ class Literal implements RouteInterface
     /**
      * getAssembledParams(): defined by RouteInterface interface.
      *
-     * @see    Route::getAssembledParams
+     * @see    RouteInterface::getAssembledParams
      * @return array
      */
     public function getAssembledParams()

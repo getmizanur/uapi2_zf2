@@ -71,6 +71,7 @@ class IsCompressed extends MimeType
             'application/x-stuffit',
             'application/x-tar',
             'application/zip',
+            'application/x-zip',
             'application/zoo',
             'multipart/x-gzip',
         );
@@ -79,10 +80,14 @@ class IsCompressed extends MimeType
             $options = ArrayUtils::iteratorToArray($options);
         }
 
-        if (empty($options)) {
-            $options = array('mimeType' => $default);
+        if ($options === null) {
+            $options = array();
         }
 
         parent::__construct($options);
+
+        if (!$this->getMimeType()) {
+            $this->setMimeType($default);
+        }
     }
 }

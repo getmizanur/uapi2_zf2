@@ -6,6 +6,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\InputFilter\Factory;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 
 use Synapse\Model\Entity\Customer;
 
@@ -71,26 +72,23 @@ class CustomerTable extends AbstractTable
             return false;      
         }
 
-        $resultSet = $this->select(function(Select $select){
-            $select->from(array('c' => 'customer'));
-            $select->join(
-                array('d' => 'device'), 
-                'd.device_cust_id = c.customer_id',
-                array(), $select::JOIN_INNER
+        $resultSet = $this->select(function(Select $select) 
+                use($cpin, $dpin, $did, $cid)  {
+            $select->join('device', 
+                        'device.device_cust_id = customer.customer_id',
+                        array(), $select::JOIN_INNER
+                    );
+            $select->where(
+                array(
+                    'customer.customer_pin' => $cpin,
+                    'customer.customer_activation_code' => $dpin,
+                    'device.device_vutv_device_id' => $did,
+                    'customer.customer_company_id' => $cid
+                ),
+                \Zend\Db\Sql\Predicate\PredicateSet::OP_AND
             );
-            $select->where(array(
-                "c.customer_pin = $cpin"
-            ));
-                   //->nest()
-                   //->equalto('c.customer_pin  = ?', $cpin)
-                   //->and()
-                   //->equalto('c.customer_activation_code  = ?', $dpin)
-                   //->and()
-                   //->equalto('d.device_vutv_device_id = ?', $did)
-                   //->and()
-                   //->equalto('c.customer_company_id  = ?', $cid);
         });
-
+            
         return $resultSet; 
     }
 

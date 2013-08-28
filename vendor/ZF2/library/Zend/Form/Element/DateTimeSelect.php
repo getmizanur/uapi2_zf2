@@ -10,11 +10,11 @@
 namespace Zend\Form\Element;
 
 use DateTime as PhpDateTime;
+use Exception;
 use Zend\Form\FormInterface;
+use Zend\Form\Exception\InvalidArgumentException;
 use Zend\Validator\ValidatorInterface;
 use Zend\Validator\Date as DateValidator;
-use Zend\Form\Exception\InvalidArgumentException;
-use Exception;
 
 class DateTimeSelect extends DateSelect
 {
@@ -291,6 +291,9 @@ class DateTimeSelect extends DateSelect
                         'callback' => function($date) {
                             // Convert the date to a specific format
                             if (is_array($date)) {
+                                if (!isset($date['second'])) {
+                                    $date['second'] = '00';
+                                }
                                 $date = sprintf('%s-%s-%s %s:%s:%s',
                                     $date['year'], $date['month'], $date['day'],
                                     $date['hour'], $date['minute'], $date['second']
