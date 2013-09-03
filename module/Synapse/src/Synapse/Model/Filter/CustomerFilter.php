@@ -4,12 +4,12 @@ namespace Synapse\Model\Filter;
 
 use Zend\InputFilter\InputFilter;
 
-class CustomerFilter extends InputFilter
+class AccountFilter extends InputFilter
 {
     public function __construct()
     {
         $this->add(array(
-            'name' => 'customer_id',
+            'name' => 'account_code',
             'required' => true,
             'filters' => array (
                 array('name' => 'html_entities'),
@@ -22,20 +22,19 @@ class CustomerFilter extends InputFilter
             )
         ));    
         $this->add(array(
-            'name' => 'customer_company_id',
-            'required' => true,
+            'name' => 'company_id',
+            'required' => false,
             'filters' => array (
                 array('name' => 'html_entities'),
                 array('name' => 'strip_tags'),
                 array('name' => 'string_trim')
             ),
             'validators' => array (
-                array('name' => 'not_empty'),
                 array('name' => 'int')
             )
         ));
         $this->add(array(
-            'name' => 'customer_title',
+            'name' => 'account_state',
             'required' => true,
             'filters' => array (
                 array('name' => 'html_entities'),
@@ -43,8 +42,12 @@ class CustomerFilter extends InputFilter
                 array('name' => 'string_trim')
             ),
             'validators' => array (
-                array('name' => 'not_empty'),
-                array('name' => 'alpha')
+                array(
+                    'name' => 'in_array'
+                    'options' => array(
+                        
+                    )
+                ),
             )
         ));
         $this->add(array(
