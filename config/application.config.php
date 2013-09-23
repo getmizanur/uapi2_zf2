@@ -15,7 +15,7 @@ return array(
         ),
         'lazy_loading' => array(
             'synapse' => array (
-                'hostname' => 'synapse.local.mediamanager',
+                'hostname' => 'uapi2.staging.simplestream.com',
                 'port' => 80,
             ),
         ),
