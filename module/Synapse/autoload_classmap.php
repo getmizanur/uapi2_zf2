@@ -16,6 +16,7 @@ return array(
     'Synapse\Model\Table\PaymentTable'    	=> __DIR__ . '/src/Synapse/Model/Table/PaymentTable.php',
     'Synapse\Model\Table\Entity\Audit'    	=> __DIR__ . '/src/Synapse/Model/Entity/Audit.php',
     'Synapse\Model\Table\Entity\Customer'    	=> __DIR__ . '/src/Synapse/Model/Entity/Customer.php',
+    'Synapse\Model\Table\Entity\RecurlyAccount' => __DIR__ . '/src/Synapse/Model/Entity/RecurlyAccount.php',
     'Synapse\Model\Table\Entity\Device'    	=> __DIR__ . '/src/Synapse/Model/Entity/Device.php',
     'Synapse\Model\Table\Filter\AuditFilter'    	=> __DIR__ . '/src/Synapse/Model/Filter/AuditFilter.php',
     'Synapse\Model\Table\Filter\CustomerFilter'    	=> __DIR__ . '/src/Synapse/Model/Filter/CustomerFilter.php',

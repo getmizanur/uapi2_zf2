@@ -4,7 +4,7 @@ namespace Synapse\Model\Filter;
 
 use Zend\InputFilter\InputFilter;
 
-class AccountFilter extends InputFilter
+class CustomerFilter extends InputFilter
 {
     public function __construct()
     {
@@ -43,7 +43,7 @@ class AccountFilter extends InputFilter
             ),
             'validators' => array (
                 array(
-                    'name' => 'in_array'
+                    'name' => 'in_array',
                     'options' => array(
                         
                     )

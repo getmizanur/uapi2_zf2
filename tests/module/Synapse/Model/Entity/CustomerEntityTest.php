@@ -67,8 +67,6 @@ class CustomerEntityTest extends PHPUnit_Framework_TestCase
             //$this->assertTrue(false);
             //var_dump($customer->isValid()->getInvalidInput());
             $filter = $customer->getInputFilter();
-            var_dump($filter->isValid());
-            var_dump($filter->getInvalidInput());
         }
     }
 } 
